@@ -2,6 +2,7 @@ package com.example.sathya.locationbackground;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -18,6 +19,12 @@ public class MapsActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+
+        }
 
         Intent mIntent=new Intent(this,BackgroundService.class);
         mIntent.setData(Uri.parse("Start_Background_Service"));

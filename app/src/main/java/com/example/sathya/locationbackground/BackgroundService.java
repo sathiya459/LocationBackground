@@ -17,6 +17,15 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by Sathya on 24-11-2015.
  */
@@ -28,6 +37,9 @@ public class BackgroundService extends IntentService implements
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     private int Notification_id=0;
+    HttpURLConnection mHttpURLConnection;
+    URL url;
+
 
     public BackgroundService(String name) {
         super(name);
@@ -84,7 +96,63 @@ public class BackgroundService extends IntentService implements
 
     @Override
     public void onLocationChanged(Location location) {
-        //createNotification(location);
+        createNotification(location);
+        postLocaation(location);
+    }
+
+    private void postLocaation(Location location) {
+        try {
+            url=new URL("http://www.locationupdate.netau.net/updatetodb.php?lat="+location.getLatitude()+"&long="+location.getLongitude());
+            //url=new URL("http://192.168.43.172/locationupdate/updatetodb.php?lat=0.011&long=70.70");
+           // url=new URL("http://192.168.43.172/locationupdate/updatetodb.php?lat="+location.getLatitude()+"&long="+location.getLongitude());
+            mHttpURLConnection= (HttpURLConnection) url.openConnection();
+            mHttpURLConnection.setConnectTimeout(5000);
+            mHttpURLConnection.setDoOutput(true);
+            //mHttpURLConnection.connect();
+            try {
+                InputStream in = new BufferedInputStream(mHttpURLConnection.getInputStream());
+                createNotification("updated");
+                //readStream(in);
+            }catch (Exception e){
+                createNotification(e);
+            }
+            finally {
+                mHttpURLConnection.disconnect();
+            }
+
+
+
+//            BufferedReader reader = null;
+//            reader = new BufferedReader(new InputStreamReader(mHttpURLConnection.getInputStream()));
+//            String result="",response="";
+//            while((result=reader.readLine())!=null){
+//                response=response+result;
+//            }
+
+
+
+
+
+        } catch (MalformedURLException e) {
+            createNotification(e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            createNotification(e);
+            e.printStackTrace();
+        }
+
+    }
+    private void createNotification(Exception e) {
+        Notification_id++;
+        Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder mBuilder=new NotificationCompat.Builder(this)
+                .setContentTitle("ERROR : "+Notification_id)
+                .setContentText("er:"+e)
+                .setSmallIcon(R.drawable.notification_template_icon_bg)
+                .setSound(uri);
+
+        NotificationManager mNotificationManager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(Notification_id,mBuilder.build());
     }
 
     private void createNotification(Location location) {
@@ -93,6 +161,18 @@ public class BackgroundService extends IntentService implements
         NotificationCompat.Builder mBuilder=new NotificationCompat.Builder(this)
                 .setContentTitle("Location Changed"+Notification_id)
                 .setContentText("Lat : "+location.getLatitude()+"\nLog : "+location.getLongitude())
+                .setSmallIcon(R.drawable.notification_template_icon_bg)
+                .setSound(uri);
+
+        NotificationManager mNotificationManager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(Notification_id,mBuilder.build());
+    }
+    private void createNotification(String s) {
+        Notification_id++;
+        Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder mBuilder=new NotificationCompat.Builder(this)
+                .setContentTitle("Location Changed"+Notification_id)
+                .setContentText(s)
                 .setSmallIcon(R.drawable.notification_template_icon_bg)
                 .setSound(uri);
 
