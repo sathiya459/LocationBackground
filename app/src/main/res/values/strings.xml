@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">LocationBackground</string>
+    <string name="title_activity_maps">GSM</string>
+</resources>
