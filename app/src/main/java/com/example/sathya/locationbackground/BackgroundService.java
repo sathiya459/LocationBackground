@@ -84,7 +84,7 @@ public class BackgroundService extends IntentService implements
 
     @Override
     public void onLocationChanged(Location location) {
-        createNotification(location);
+        //createNotification(location);
     }
 
     private void createNotification(Location location) {
