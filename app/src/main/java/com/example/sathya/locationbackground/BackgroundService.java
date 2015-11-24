@@ -96,7 +96,7 @@ public class BackgroundService extends IntentService implements
 
     @Override
     public void onLocationChanged(Location location) {
-        createNotification(location);
+        //createNotification(location);
         postLocaation(location);
     }
 
@@ -111,7 +111,7 @@ public class BackgroundService extends IntentService implements
             //mHttpURLConnection.connect();
             try {
                 InputStream in = new BufferedInputStream(mHttpURLConnection.getInputStream());
-                createNotification("updated");
+              //  createNotification("updated");
                 //readStream(in);
             }catch (Exception e){
                 createNotification(e);
